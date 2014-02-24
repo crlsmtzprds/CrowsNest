@@ -6,14 +6,14 @@
  * @author RWOverdijk
  * @license MIT
  * @uses ./index
- * @uses ./common/providers/SailsProvider
+ * @uses ./core/providers/SailsProvider
  *
  * @todo figure out how to compile views in templateCache with grunt.
  */
 angular.module('crowsNest', [
   'ui.router',
   'cn.index',
-  'common.providers'
+  'core.providers'
 //  'ngRoute',
 //  'ngResource',
 //  'ui.bootstrap'

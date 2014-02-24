@@ -19,11 +19,10 @@
    * @param $scope
    * @constructor
    */
-  function IndexController($scope, sails) {
+  function IndexController($scope, $sails) {
 
-    $scope.names = $sails.find();
 
-    $scope.data = sails.getStuff()
+    $scope.data = $sails.getStuff()
 
   }
 

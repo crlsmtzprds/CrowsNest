@@ -30,6 +30,10 @@ module.exports.routes = {
     view: 'homepage'
   },
 
+  '/name': {
+    view: 'homepage'
+  },
+
   '/name/:name': {
     view: 'homepage'
   }

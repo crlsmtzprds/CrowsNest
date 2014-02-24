@@ -12,29 +12,30 @@
   var app = angular.module('crowsNest');
 
   /**
-   * Configure method for app.
+   * Configure routes.
    *
-   * @param $routeProvider
+   * @param $stateProvider
    * @param $locationProvider
+   * @param $urlRouterProvider
    */
-  function configure($routeProvider, $locationProvider) {
-    $routeProvider.when('/', {
+  function configure($stateProvider, $locationProvider, $urlRouterProvider) {
+    $stateProvider.state('index', {
+      url: '/',
       templateUrl: '/views/index.html',
       controller: 'IndexController'
     });
 
-    $routeProvider.when('/name/:name', {
+    $stateProvider.state('name', {
+      url: '/name/{name}',
       templateUrl: '/views/name.html',
       controller: 'NameController'
     });
 
-    $routeProvider.otherwise({
-      redirectTo: '/'
-    });
+    $urlRouterProvider.otherwise('/');
 
     $locationProvider.html5Mode(true);
   }
 
   // Apply the configure method to the app.
-  app.config(['$routeProvider', '$locationProvider', configure]);
+  app.config(['$stateProvider', '$locationProvider', '$urlRouterProvider', configure]);
 })();

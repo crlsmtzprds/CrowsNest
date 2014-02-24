@@ -20,12 +20,12 @@
    * @param $routeParams
    * @constructor
    */
-  function NameController($scope, $routeParams) {
+  function NameController($scope, $stateParams) {
     var data = $scope.data = {};
 
-    data.name = $routeParams.name;
+    data.name = $stateParams.name;
   }
 
   // Add the NameController to the module.
-  module.controller('NameController', ['$scope', '$routeParams', NameController]);
+  module.controller('NameController', ['$scope', '$stateParams', NameController]);
 })();

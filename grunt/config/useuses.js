@@ -4,12 +4,12 @@ module.exports = function(grunt) {
     app: {
       files: {
         '.tmp/public/js/main.js': 'assets/js/main.js',
-        '.tmp/public/js/common.js': 'assets/js/common/main.js'
+        '.tmp/public/js/core.js': 'assets/js/core/main.js'
       },
 
       options: {
         aliases: {
-          'common': 'assets/js/common',
+          'core': 'assets/js/core',
           'angular': 'assets/vendor/angular/angular',
           'angular-ui-router': 'assets/vendor/angular-ui-router/release/angular-ui-router'
         }

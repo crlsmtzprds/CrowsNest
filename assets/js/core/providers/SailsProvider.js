@@ -1,6 +1,8 @@
 /**
  * SailsProvider
  *
+ * DO NOT TAKE THIS FILE SERIOUSLY. IT'S A COPY PASTE MESS THAT'S HERE FOR REFERENCE REASONS IN DEV.
+ *
  * @author RWOverdijk
  * @license MIT
  *
@@ -13,7 +15,7 @@
 
   'use strict';
 
-  var module = angular.module('common.providers', []);
+  var module = angular.module('core.providers', []);
 
   function SailsProvider() {
 
