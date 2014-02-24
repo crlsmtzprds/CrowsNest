@@ -1,0 +1,35 @@
+{
+  "name": "CrowsNest",
+  "version": "0.0.1",
+  "authors": [
+    "RWOverdijk <r.w.overdijk@gmail.com>"
+  ],
+  "description": "User interface for the CrowsNest server monitoring application.",
+  "keywords": [
+    "server",
+    "monitoring",
+    "sails",
+    "node",
+    "express",
+    "bootstrap"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/Barque/CrowsNest",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "assets/vendor",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "~1.2.13",
+    "angular-bootstrap": "~0.10.0",
+    "bootstrap": "~3.1.1",
+    "angular-mocks": "~1.2.13",
+    "angular-cookies": "~1.2.13",
+    "angular-ui-router": "0.2.8-bowratic-tedium"
+  }
+}
