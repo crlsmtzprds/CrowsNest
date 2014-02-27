@@ -1,177 +1,94 @@
 /**
  * SailsProvider
  *
- * DO NOT TAKE THIS FILE SERIOUSLY. IT'S A COPY PASTE MESS THAT'S HERE FOR REFERENCE REASONS IN DEV.
- *
  * @author RWOverdijk
  * @license MIT
  *
- * @todo Figure out how to use $scope.$apply(), and make this provider at least _functional_ and _pretty_.
- * @todo Find out how association pubsub works and adjust accordingly
- * @todo find a way to provide a nice Model (optional, build with .find etc).
+ * @uses ./module
+ *
+ * @todo https://gist.github.com/robwormald/9218949 (line 39) find an elegant solution using this resource.
+ *  Perhaps make new model a provider. I'll need something for the socket stuff.
+ *    Socket "thing" should be part of sails provider (has to stay simple)
+ *
+ * @todo add functionality for $resource, making pubsub as well as sockets optional.
+ * @todo add Entity class that allows you to update, delete etc.
+ * @todo build all request types
+ * @todo Map request types to model functions.
+ * @todo restructure code.
+ * @todo Figure out if every model will have a copy of the methods etc.
  */
 ;
-(function SetupSailsProvider() {
+(function setupSailsProvider() {
 
-  'use strict';
-
-  var module = angular.module('core.providers', []);
+  var modelConfigs = []
+    , models = {};
 
   function SailsProvider() {
 
-    // when forwarding events, prefix the event name
-    var prefix = 'socket:'
-      , ioSocket
-      , data = {};
+    /**
+     * Normalize config.
+     *
+     * @param {string} name
+     * @param {{}} config
+     * @returns {{}}
+     */
+    function normalizeConfig(name, config) {
+      return angular.extend({
+        name: name,
+        path: '/' + name.replace(/(^\/|\/$)/g, ''),
+        primaryKey: 'id',
+        autoPubSub: false,
+        associations: null
+      }, config || {});
+    }
 
-    // expose to provider
-    this.$get = function($rootScope, $timeout) {
-      var socket = ioSocket || io.connect();
+    /**
+     * Register a model with the SailsProvider.
+     *
+     * @param {string} name
+     * @param {{}} [config]
+     * @returns {SailsProvider}
+     */
+    this.registerModel = function(name, config) {
+      modelConfigs.push(normalizeConfig(name, config));
 
-      var asyncAngularify = function(callback) {
-        return function() {
-          var args = arguments;
-          $timeout(function() {
-            callback.apply(socket, args);
-          }, 0);
-        };
-      };
+      return this;
+    };
 
-      var addListener = function(eventName, callback) {
-        socket.on(eventName, asyncAngularify(callback));
-      };
+    /**
+     * Exposed methods for provider.
+     *
+     * @type {Array}
+     */
+    this.$get = ['$rootScope', '$timeout', '$sailsModel', function($rootScope, $timeout, $sailsModel) {
 
-      var wrappedSocket = {
-        on: addListener,
-        addListener: addListener,
+      // Instantiate all models that have been configured up until now.
+      modelConfigs.forEach(function(config) {
+        models[config.name] = $sailsModel(config);
+      });
 
-        emit: function(eventName, data, callback) {
-          if (callback) {
-            socket.emit(eventName, data, asyncAngularify(callback));
-          } else {
-            socket.emit(eventName, data);
+      return {
+
+        /**
+         * Get a model.
+         *
+         * @param {string} name
+         * @returns {{}}
+         */
+        model: function(name) {
+
+          // In case the model doesn't exist it yet, create it.
+          if (typeof models[name] !== 'object') {
+            models[name] = $sailsModel(normalizeConfig(name));
           }
-        },
 
-        request: function(url, data, cb, method) {
-
-          // Remove trailing slashes and spaces
-          url = url.replace(/^(.+)\/*\s*$/, '$1');
-          method = method || 'get';
-
-
-          if (typeof url !== 'string') {
-            throw 'Invalid or missing URL!';
-          }
-
-          // Allow data arg to be optional
-          if (typeof data === 'function') {
-            cb = data;
-            data = {};
-          }
-
-          // Build to request
-          var json = io.JSON.stringify({
-            url: url,
-            data: data
-          });
-
-
-          // Send the message over the socket
-          wrappedSocket.emit(method, json, function afterEmitted(result) {
-
-            var parsedResult = result;
-
-            if (result && typeof result === 'string') {
-              try {
-                parsedResult = io.JSON.parse(result);
-              } catch (e) {
-                throw "Server response could not be parsed!\n" + result;
-              }
-            }
-
-            // TODO: Handle errors more effectively
-            if (parsedResult === 404) throw new Error("404: Not found");
-            if (parsedResult === 403) throw new Error("403: Forbidden");
-            if (parsedResult === 500) throw new Error("500: Server error");
-
-            cb && cb(parsedResult);
-
-          });
-        },
-
-        get: function(url, data, cb) {
-          return this.request(url, data, cb, 'get');
-        },
-
-        post: function(url, data, cb) {
-          return this.request(url, data, cb, 'post');
-        },
-
-        put: function(url, data, cb) {
-          return this.request(url, data, cb, 'put');
-        },
-
-        delete: function(url, data, cb) {
-          return this.request(url, data, cb, 'delete');
-        },
-
-        removeListener: function() {
-          var args = arguments;
-          return socket.removeListener.apply(socket, args);
-        },
-
-        // when socket.on('someEvent', fn (data) { ... }),
-        // call scope.$broadcast('someEvent', data)
-        forward: function(events, scope) {
-          if (events instanceof Array === false) {
-            events = [events];
-          }
-          if (!scope) {
-            scope = $rootScope;
-          }
-          events.forEach(function(eventName) {
-            var prefixed = prefix + eventName;
-            var forwardEvent = asyncAngularify(function(data) {
-              scope.$broadcast(prefixed, data);
-            });
-            scope.$on('$destroy', function() {
-              socket.removeListener(eventName, forwardEvent);
-            });
-            socket.on(eventName, forwardEvent);
-          });
+          return models[name];
         }
       };
-
-      data.names = [
-        'RWOverdijk',
-        'Roberto',
-        'Wesley',
-        'Overdijk'
-      ];
-
-      wrappedSocket.getStuff = function() {
-        return data;
-      }
-
-      $timeout(function() {
-        $rootScope.$apply(function() {
-          data.names.push('last');
-          data.names.unshift('first');
-        });
-      }, 4000);
-
-      return wrappedSocket;
-    };
-
-    this.prefix = function(newPrefix) {
-      prefix = newPrefix;
-    };
-
-    this.ioSocket = function(socket) {
-      ioSocket = socket;
-    };
+    }];
   }
 
-  module.provider('sails', SailsProvider);
+  var module = angular.module('core.providers');
+
+  module.provider('$sails', SailsProvider);
 })();

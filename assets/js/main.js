@@ -5,6 +5,7 @@
  * @license MIT
  *
  * @uses ./app
+ * @uses ./config
  * @uses ./routes
  */
 ;

@@ -1,9 +1,9 @@
-<div ng-controller="IndexController">
+<div>
     <h3>Just showing you it works!</h3>
     <ul>
         <li ng-repeat="name in data.names">
-            <a href="/name/{{name}}">{{ name }}</a>
+            <input type="text" ng-model="name.name" /> <button ng-click="name.save()">Save</button>
         </li>
     </ul>
+    <hr>
 </div>
-

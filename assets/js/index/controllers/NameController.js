@@ -23,6 +23,7 @@
   function NameController($scope, $stateParams) {
     var data = $scope.data = {};
 
+    // @todo fix pubsub! reference not updating. Why? Only god knows, I guess.
     data.name = $stateParams.name;
   }
 
